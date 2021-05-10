@@ -23,6 +23,73 @@ Maria Jose Castro Lemus         181202
 
 #define MAX_CLIENTS 100
 #define BUFFER_SZ 2048
+#define NAME_LEN 32
+
+// * Global Variable for Client Count
+static _Atomic unsigned int cli_count;
+static int uid = 10;
+
+// * Client Structure
+typedef struct {
+    struct sockaddr_in address;
+    int sockfd;
+    int uid; // Unique for every client
+    char name[NAME_LEN];
+} client_t;
+
+client_t *clients[MAX_CLIENTS];
+
+pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+void str_overwrite_stdout(){
+    printf("\r%s", "> ");
+    fflush(stdout);
+}
+
+void str_trim_lf(char* arr, int length){
+    for(int i=0; i<length; i++){
+        if(arr[i]=="\n"){
+            arr[i]="\0";
+            break;
+        }
+    }
+}
+
+// * Add clients to queue
+// Multithreading Applyied
+void queue_add(client_t *cl){
+    pthread_mutex_lock(&clients_mutex);
+
+    for(int i=0; i<MAX_CLIENTS; i++){
+        if(!clients[i]){
+            clients[i] = cl;
+            break;
+        }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
+}
+
+// * Remove client
+void queue_remove(int uid){
+    pthread_mutex_lock(&clients_mutex);
+
+    for(int i=0; i<MAX_CLIENTS; i++){
+        if(!clients[i]){
+            if(clients[i]->uid == uid){
+                clients[i] = NULL;
+                break;
+            }
+        }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
+}
+
+// * Print IP address of client
+void print_ip_addr(struct sockaddr_in addr){
+    printf("%d.%d.%d.%d", addr.sin_addr.s_addr & 0xff, (addr.sin_addr.s_addr & 0xff00) >> 8, (addr.sin_addr.s_addr & 0xff0000) >> 16, (addr.sin_addr.s_addr & 0xff000000) >> 24);
+}
 
 int main(int argc, char **argv){
     if(argc != 2){
@@ -69,6 +136,24 @@ int main(int argc, char **argv){
     }
 
     printf("=== Welcome to Chatroom === \n");
+
+    while(1){
+        socklen_t clilen = sizeof(cli_addr);
+
+        // Accept the connection with client
+        connfd = accept(listenfd, (struct sockaddr*)&cli_addr, &clilen);
+
+        // Verify max ammount of connected clients
+        if((cli_count + 1) == MAX_CLIENTS){
+            printf("Maximun ammount of clients connected. Connection rejected.\n")
+            print_ip_addr(cli_addr);
+            close(connfd);
+            continue;
+        }
+
+
+
+    }
 
     return EXIT_SUCCESS;
 
