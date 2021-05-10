@@ -47,6 +47,47 @@ void catch_ctrl_c_and_exit(){
     flag = 1;
 }
 
+// * Receive Msg from server
+void recv_msg_handler(){
+    char message[BUFFER_SZ] = {};
+    while(1){
+        int receive = recv(sockfd, message, BUFFER_SZ, 0);
+        if(receive > 0){// We receive something
+            printf("%s ", message);
+            str_overwrite_stdout();
+        } else if(receive == 0){ // Error
+            break;
+        }
+        bzero(message, BUFFER_SZ);
+    }
+}
+
+// * Send Msg
+void send_mes_handler(){
+    char buffer[BUFFER_SZ] = {};
+    char message[BUFFER_SZ + NAME_LEN] = {};
+    while (1)
+    {
+        str_overwrite_stdout();
+        fgets(buffer, BUFFER_SZ, sdtin);
+        str_trim_lf(buffer, BUFFER_SZ);
+        if (strcmp(buffer, "exit") == 0)
+        {
+            break;
+        } else {
+            sprintf(message, "%s: %s", name, buffer);
+            send(sockfd, message, strlen(message), 0);
+        }
+
+        bzero(buffer, BUFFER_SZ);
+        bzero(buffer, BUFFER_SZ + NAME_LEN);
+        
+    }
+
+    catch_ctrl_c_and_exit(2);
+    
+}
+
 int main(int argc, char **argv){
     if(argc != 2){
         printf("Usage: %s <port>\n", argv[0]);
@@ -88,6 +129,30 @@ int main(int argc, char **argv){
     
     printf("=== Welcome to Chatroom === \n");
 
+    // Thread for sending msg
+    pthread_t send_msg_thread;
+    if(pthread_create(&send_msg_thread, NULL, (void*)send_msg_handler, NULL) != 0){
+        printf("ERROR: pthread.\n");
+        return EXIT_FAILURE;
+    }
+
+    // Thread for receiving msg
+    pthread_t recv_msg_thread;
+    if(pthread_create(&recv_msg_thread, NULL, (void*)recv_msg_handler, NULL) != 0){
+        printf("ERROR: pthread.\n");
+        return EXIT_FAILURE;
+    }
+
+    while (1)
+    {
+        if(flag){
+            printf("\nBye\n");
+            break;
+        }
+    }
+
+    close(sockfd);
+    
     return EXIT_SUCCESS;
 
 }
