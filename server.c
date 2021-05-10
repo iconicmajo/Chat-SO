@@ -35,7 +35,7 @@ int main(int argc, char **argv){
 
     int option = 1;
 
-    int listenfd = 0, connfd = 0;
+	int listenfd = 0, connfd = 0;
     struct sockaddr_in serv_addr;
     struct sockaddr_in cli_addr;
 
@@ -51,7 +51,7 @@ int main(int argc, char **argv){
     // Signals
     signal(SIGPIPE, SIG_IGN);
 
-    if(setsockopt(listenfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR),(char*)&option, sizeof(option)) < 0 ){
+    if(setsockopt(listenfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR),(char*)&option,sizeof(option)) < 0){
         printf("ERROR: setsockopt\n");
         return EXIT_FAILURE;
     }
@@ -63,7 +63,7 @@ int main(int argc, char **argv){
     }
 
     // Listen
-    if(listen(listenfd, 10) < 10){
+    if (listen(listenfd, 10) < 0) {
         printf("ERROR: listen\n");
         return EXIT_FAILURE;
     }
