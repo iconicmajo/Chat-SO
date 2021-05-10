@@ -51,7 +51,7 @@ int main(int argc, char **argv){
     // Signals
     signal(SIGPIPE, SIG_IGN);
 
-    if(setsockport(listenfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR),(char*)&option, sizeof(option)) < 0 ){
+    if(setsockopt(listenfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR),(char*)&option, sizeof(option)) < 0 ){
         printf("ERROR: setsockopt\n");
         return EXIT_FAILURE;
     }
