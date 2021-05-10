@@ -133,7 +133,7 @@ void *handle_client(void *arg){
         send_message(buffer, cli->uid);
     }
 
-    bzero(buffer < BUFFER_SZ);
+    bzero(buffer, BUFFER_SZ);
 
     while (1)
     {
@@ -162,7 +162,7 @@ void *handle_client(void *arg){
                 leave_flag = 1;
             }
 
-            bzero(buffer < BUFFER_SZ);
+            bzero(buffer, BUFFER_SZ);
 
         }
     }
@@ -237,7 +237,7 @@ int main(int argc, char **argv){
 
         // Verify max ammount of connected clients
         if((cli_count + 1) == MAX_CLIENTS){
-            printf("Maximun ammount of clients connected. Connection rejected.\n")
+            printf("Maximun ammount of clients connected. Connection rejected.\n");
             print_ip_addr(cli_addr);
             close(connfd);
             continue;
