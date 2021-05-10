@@ -48,8 +48,8 @@ void str_overwrite_stdout(){
 
 void str_trim_lf(char* arr, int length){
     for(int i=0; i<length; i++){
-        if(arr[i]=="\n"){
-            arr[i]="\0";
+        if(arr[i]=='\n'){
+            arr[i]='\0';
             break;
         }
     }
@@ -86,9 +86,101 @@ void queue_remove(int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
+// * Send Msg to all clients, except to sender
+void send_message(char *s, int uid){
+    pthread_mutex_lock(&clients_mutex);
+
+    for(int i=0; i<MAX_CLIENTS; i++){
+        if(clients[i]){
+            if(clients[i]->uid != uid){
+                if(write(clients[i]-> sockfd, s, strlen(s)) < 0){
+                    printf("ERROR: write to descriptor failed.");
+                    break;
+                }
+            }
+        }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
+}
+
 // * Print IP address of client
 void print_ip_addr(struct sockaddr_in addr){
     printf("%d.%d.%d.%d", addr.sin_addr.s_addr & 0xff, (addr.sin_addr.s_addr & 0xff00) >> 8, (addr.sin_addr.s_addr & 0xff0000) >> 16, (addr.sin_addr.s_addr & 0xff000000) >> 24);
+}
+
+// * Main function
+void *handle_client(void *arg){
+    char buffer[BUFFER_SZ];
+    char name[NAME_LEN];
+
+    // Client is connected or not?
+    int leave_flag = 0;
+    // Increment Client count
+    cli_count++;
+
+    client_t *cli = (client_t*)arg;
+
+    //Name from the client
+    if(recv(cli->sockfd, name, NAME_LEN, 0) <= 0 || strlen(name) < 2 || strlen(name) >= NAME_LEN - 1){
+        printf("ERROR: Pkease enter a valid name.\n");
+        leave_flag = 1;
+    } else {
+        // Display that a client has joined
+        strcpy(cli->name, name);
+        sprintf(buffer, "%s has joined\n", cli->name);
+        printf("%s", buffer);
+        send_message(buffer, cli->uid);
+    }
+
+    bzero(buffer < BUFFER_SZ);
+
+    while (1)
+    {
+        if(leave_flag){
+            break;
+        }
+
+        int receive = recv(cli->sockfd, buffer, BUFFER_SZ, 0);
+
+        if (receive > 0)
+        {
+            if (strlen(buffer) > 0)
+            {
+                send_message(buffer, cli->uid);
+                str_trim_lf(buffer, strlen(buffer));
+                printf("%s -> %s", buffer, cli->name);
+            } else if (receive == 0 || strcmp(buffer, "exit") == 0)
+            {
+                // Send Message that a client has left
+                sprintf(buffer, "%s has left\n", cli->name);
+                printf("%s", buffer);
+                send_message(buffer, cli->uid);
+                leave_flag = 1;
+            } else {
+                printf("ERROR: -l\n");
+                leave_flag = 1;
+            }
+
+            bzero(buffer < BUFFER_SZ);
+
+        }
+    }
+
+    // * CLient has left
+
+    // Close Socket connection
+    close(cli->sockfd);
+    queue_remove(cli->uid);
+    free(cli);
+
+    // Decrease Client count
+    cli_count--;
+
+    pthread_detach(pthread_self());
+
+    return NULL;
+
 }
 
 int main(int argc, char **argv){
@@ -150,6 +242,20 @@ int main(int argc, char **argv){
             close(connfd);
             continue;
         }
+
+        // Client Settings
+        client_t *cli = (client_t *)malloc(sizeof(client_t));
+        cli->address = cli_addr;
+        cli->sockfd = connfd;
+        cli->uid = uid++;
+
+        // Add Client to queue
+        queue_add(cli);
+        // Create Thread
+        pthread_create(&tid, NULL, &handle_client, (void*)cli);
+
+        //Reduce CPU usage
+        sleep(1);
 
 
 
