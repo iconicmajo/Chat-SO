@@ -116,6 +116,7 @@ void *handle_client(void *arg){
 
     // Client is connected or not?
     int leave_flag = 0;
+
     // Increment Client count
     cli_count++;
 
@@ -158,7 +159,7 @@ void *handle_client(void *arg){
                 send_message(buffer, cli->uid);
                 leave_flag = 1;
             } else {
-                printf("ERROR: -l\n");
+                printf("ERROR: -1\n");
                 leave_flag = 1;
             }
 
@@ -203,13 +204,11 @@ int main(int argc, char **argv){
     // Socket Settings
     listenfd = socket(AF_INET, SOCK_STREAM, 0);
     serv_addr.sin_family = AF_INET;
-
     serv_addr.sin_addr.s_addr = inet_addr(ip);
     serv_addr.sin_port = htons(port);
 
     // Signals
     signal(SIGPIPE, SIG_IGN);
-
     if(setsockopt(listenfd, SOL_SOCKET, (SO_REUSEPORT | SO_REUSEADDR),(char*)&option,sizeof(option)) < 0){
         printf("ERROR: setsockopt\n");
         return EXIT_FAILURE;
@@ -228,6 +227,8 @@ int main(int argc, char **argv){
     }
 
     printf("=== Welcome to Chatroom === \n");
+
+    // ! TODO: imprimir instrucciones de uso
 
     while(1){
         socklen_t clilen = sizeof(cli_addr);

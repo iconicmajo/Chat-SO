@@ -43,7 +43,7 @@ void str_trim_lf(char* arr, int length){
 }
 
 // * Exit function
-void catch_ctrl_c_and_exit(){
+void catch_ctrl_c_and_exit(int sig){
     flag = 1;
 }
 
