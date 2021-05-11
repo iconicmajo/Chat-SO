@@ -63,13 +63,13 @@ void recv_msg_handler(){
 }
 
 // * Send Msg
-void send_mes_handler(){
+void send_msg_handler(){
     char buffer[BUFFER_SZ] = {};
     char message[BUFFER_SZ + NAME_LEN] = {};
     while (1)
     {
         str_overwrite_stdout();
-        fgets(buffer, BUFFER_SZ, sdtin);
+        fgets(buffer, BUFFER_SZ, stdin);
         str_trim_lf(buffer, BUFFER_SZ);
         if (strcmp(buffer, "exit") == 0)
         {
