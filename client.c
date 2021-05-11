@@ -64,8 +64,8 @@ void recv_msg_handler(){
 
 // * Send Msg
 void send_msg_handler(){
-    char buffer[BUFFER_SZ] = {};
-    char message[BUFFER_SZ + NAME_LEN] = {};
+    char message[BUFFER_SZ] = {};
+    char buffer[BUFFER_SZ + NAME_LEN] = {};
     while (1)
     {
         str_overwrite_stdout();
