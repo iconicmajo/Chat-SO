@@ -79,7 +79,7 @@ void send_msg_handler(){
             send(sockfd, message, strlen(message), 0);
         }
 
-        bzero(buffer, BUFFER_SZ);
+        bzero(message, BUFFER_SZ);
         bzero(buffer, BUFFER_SZ + 32);
         
     }
