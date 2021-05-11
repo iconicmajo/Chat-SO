@@ -123,7 +123,7 @@ void *handle_client(void *arg){
 
     //Name from the client
     if(recv(cli->sockfd, name, NAME_LEN, 0) <= 0 || strlen(name) < 2 || strlen(name) >= NAME_LEN - 1){
-        printf("ERROR: Pkease enter a valid name.\n");
+        printf("ERROR: Please enter a valid name.\n");
         leave_flag = 1;
     } else {
         // Display that a client has joined
@@ -154,7 +154,7 @@ void *handle_client(void *arg){
             {
                 // Send Message that a client has left
                 sprintf(buffer, "%s has left\n", cli->name);
-                printf("%s", buffer);
+                printf("%s\n", buffer);
                 send_message(buffer, cli->uid);
                 leave_flag = 1;
             } else {

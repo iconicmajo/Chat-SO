@@ -80,7 +80,7 @@ void send_msg_handler(){
         }
 
         bzero(buffer, BUFFER_SZ);
-        bzero(buffer, BUFFER_SZ + NAME_LEN);
+        bzero(buffer, BUFFER_SZ + 32);
         
     }
 
