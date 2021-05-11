@@ -65,13 +65,13 @@ void recv_msg_handler(){
 // * Send Msg
 void send_msg_handler(){
     char message[BUFFER_SZ] = {};
-    char buffer[BUFFER_SZ + NAME_LEN] = {};
+    char buffer[BUFFER_SZ + 32] = {};
     while (1)
     {
         str_overwrite_stdout();
-        fgets(buffer, BUFFER_SZ, stdin);
-        str_trim_lf(buffer, BUFFER_SZ);
-        if (strcmp(buffer, "exit") == 0)
+        fgets(message, BUFFER_SZ, stdin);
+        str_trim_lf(message, BUFFER_SZ);
+        if (strcmp(message, "exit") == 0)
         {
             break;
         } else {
