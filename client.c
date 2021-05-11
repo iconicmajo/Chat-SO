@@ -75,8 +75,8 @@ void send_msg_handler(){
         {
             break;
         } else {
-            sprintf(message, "%s: %s", name, buffer);
-            send(sockfd, message, strlen(message), 0);
+            sprintf(buffer, "%s: %s", name, message);
+            send(sockfd, buffer, strlen(buffer), 0);
         }
 
         bzero(message, BUFFER_SZ);
