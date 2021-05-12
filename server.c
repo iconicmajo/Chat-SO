@@ -66,9 +66,11 @@ void queue_add(client_t *cl){
     pthread_mutex_lock(&clients_mutex);
 
     char buffer_out[BUFFER_SZ];
+    char name[32];
     for(int i=0; i<MAX_CLIENTS; ++i){
         if(!clients[i]){
             clients[i] = cl;
+            strcpy(cli->name, name);
             sprintf(buffer_out, "Prueba: %s\n", cl->name);
             printf("%s", buffer_out);
             break;
