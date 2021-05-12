@@ -68,7 +68,7 @@ void queue_add(client_t *cl){
     for(int i=0; i<MAX_CLIENTS; ++i){
         if(!clients[i]){
             clients[i] = cl;
-            printf("Prueba: %s\n", clients[i]->name);
+            printf("Prueba: %s\n", *clients[i]->name);
 
             break;
         }
