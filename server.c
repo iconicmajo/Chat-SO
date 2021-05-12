@@ -65,10 +65,11 @@ void print_ip_addr(struct sockaddr_in addr){
 void queue_add(client_t *cl){
     pthread_mutex_lock(&clients_mutex);
 
+    char buffer_out[BUFFER_SZ];
     for(int i=0; i<MAX_CLIENTS; ++i){
         if(!clients[i]){
             clients[i] = cl;
-            printf("Prueba: %s\n", &cl->name);
+            sprintf(buffer_out, "Prueba: %s\n", cl->name);
 
             break;
         }
