@@ -21,13 +21,11 @@ Osmin Josue Sagastume           18173
 #include <arpa/inet.h>
 #include <pthread.h>
 
-#define MAX_CLIENTS 100
-#define BUFFER_SZ 2048
-#define NAME_LEN 32
+#define LENGTH 2048
 
 volatile sig_atomic_t flag = 0;
 int sockfd = 0;
-char name[NAME_LEN];
+char name[32];
 
 void str_overwrite_stdout(){
     printf("\r%s", "> ");
@@ -48,30 +46,15 @@ void catch_ctrl_c_and_exit(int sig){
     flag = 1;
 }
 
-// * Receive Msg from server
-void recv_msg_handler(){
-    char message[BUFFER_SZ] = {};
-    while(1){
-        int receive = recv(sockfd, message, BUFFER_SZ, 0);
-        if(receive > 0){// We receive something
-            printf("%s ", message);
-            str_overwrite_stdout();
-        } else if(receive == 0){ // Error
-            break;
-        }
-        bzero(message, BUFFER_SZ);
-    }
-}
-
 // * Send Msg
 void send_msg_handler(){
-    char message[BUFFER_SZ] = {};
-    char buffer[BUFFER_SZ + 32] = {};
+    char message[LENGTH] = {};
+    char buffer[LENGTH + 32] = {};
     while (1)
     {
         str_overwrite_stdout();
-        fgets(message, BUFFER_SZ, stdin);
-        str_trim_lf(message, BUFFER_SZ);
+        fgets(message, LENGTH, stdin);
+        str_trim_lf(message, LENGTH);
         if (strcmp(message, "exit") == 0)
         {
             break;
@@ -80,13 +63,29 @@ void send_msg_handler(){
             send(sockfd, buffer, strlen(buffer), 0);
         }
 
-        bzero(message, BUFFER_SZ);
-        bzero(buffer, BUFFER_SZ + 32);
+        bzero(message, LENGTH);
+        bzero(buffer, LENGTH + 32);
         
     }
 
     catch_ctrl_c_and_exit(2);
     
+}
+
+// * Receive Msg from server
+void recv_msg_handler(){
+    char message[LENGTH] = {};
+    while(1){
+        int receive = recv(sockfd, message, LENGTH, 0);
+        if(receive > 0){// We receive something
+            printf("%s ", message);
+            str_overwrite_stdout();
+        } else if(receive == 0){ // Error
+            break;
+        }
+        // bzero(message, LENGTH);
+        memset(message, 0, sizeof(message));
+    }
 }
 
 int main(int argc, char **argv){
@@ -101,11 +100,11 @@ int main(int argc, char **argv){
     signal(SIGINT, catch_ctrl_c_and_exit);
 
     printf("Enter your name: ");
-    fgets(name, NAME_LEN, stdin);
+    fgets(name, 32, stdin);
 
     str_trim_lf(name, strlen(name));
 
-    if(strlen(name) > NAME_LEN - 1 || strlen(name) < 2){
+    if(strlen(name) > 32 || strlen(name) < 2){
         printf("Please enter a valid name.\n");
         return EXIT_FAILURE;
     }
@@ -126,7 +125,7 @@ int main(int argc, char **argv){
     }
 
     // Send client's Name
-    send(sockfd, name, NAME_LEN, 0);
+    send(sockfd, name, 32, 0);
     
     printf("=== Welcome to Chatroom === \n");
 
