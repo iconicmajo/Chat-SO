@@ -59,7 +59,7 @@ void send_msg_handler(){
         {
             break;
         } else {
-            sprintf(buffer, "%s: %s", name, message);
+            sprintf(buffer, "%s: %s\n", name, message);
             send(sockfd, buffer, strlen(buffer), 0);
         }
 
