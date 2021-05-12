@@ -70,7 +70,7 @@ void queue_add(client_t *cl){
     for(int i=0; i<MAX_CLIENTS; ++i){
         if(!clients[i]){
             clients[i] = cl;
-            strcpy(cli->name, name);
+            strcpy(cl->name, name);
             sprintf(buffer_out, "Prueba: %s\n", cl->name);
             printf("%s", buffer_out);
             break;
