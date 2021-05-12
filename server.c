@@ -24,10 +24,9 @@ Osmin Josue Sagastume           18173
 
 #define MAX_CLIENTS 100
 #define BUFFER_SZ 2048
-#define NAME_LEN 32
 
 // * Global Variable for Client Count
-static _Atomic unsigned int cli_count;
+static _Atomic unsigned int cli_count = 0;
 static int uid = 10;
 
 // * Client Structure
@@ -35,7 +34,7 @@ typedef struct {
     struct sockaddr_in address;
     int sockfd;
     int uid; // Unique for every client
-    char name[NAME_LEN];
+    char name[32];
 } client_t;
 
 client_t *clients[MAX_CLIENTS];
@@ -56,12 +55,17 @@ void str_trim_lf(char* arr, int length){
     }
 }
 
+// * Print IP address of client
+void print_ip_addr(struct sockaddr_in addr){
+    printf("%d.%d.%d.%d", addr.sin_addr.s_addr & 0xff, (addr.sin_addr.s_addr & 0xff00) >> 8, (addr.sin_addr.s_addr & 0xff0000) >> 16, (addr.sin_addr.s_addr & 0xff000000) >> 24);
+}
+
 // * Add clients to queue
 // Multithreading Applyied
 void queue_add(client_t *cl){
     pthread_mutex_lock(&clients_mutex);
 
-    for(int i=0; i<MAX_CLIENTS; i++){
+    for(int i=0; i<MAX_CLIENTS; ++i){
         if(!clients[i]){
             clients[i] = cl;
             break;
@@ -76,8 +80,8 @@ void queue_add(client_t *cl){
 void queue_remove(int uid){
     pthread_mutex_lock(&clients_mutex);
 
-    for(int i=0; i<MAX_CLIENTS; i++){
-        if(!clients[i]){
+    for(int i=0; i<MAX_CLIENTS; ++i){
+        if(clients[i]){
             if(clients[i]->uid == uid){
                 clients[i] = NULL;
                 break;
@@ -92,7 +96,7 @@ void queue_remove(int uid){
 void send_message(char *s, int uid){
     pthread_mutex_lock(&clients_mutex);
 
-    for(int i=0; i<MAX_CLIENTS; i++){
+    for(int i=0; i<MAX_CLIENTS; ++i){
         if(clients[i]){
             if(clients[i]->uid != uid){
                 if(write(clients[i]-> sockfd, s, strlen(s)) < 0){
@@ -106,15 +110,10 @@ void send_message(char *s, int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
-// * Print IP address of client
-void print_ip_addr(struct sockaddr_in addr){
-    printf("%d.%d.%d.%d", addr.sin_addr.s_addr & 0xff, (addr.sin_addr.s_addr & 0xff00) >> 8, (addr.sin_addr.s_addr & 0xff0000) >> 16, (addr.sin_addr.s_addr & 0xff000000) >> 24);
-}
-
 // * Main function
 void *handle_client(void *arg){
-    char buffer[BUFFER_SZ];
-    char name[NAME_LEN];
+    char buffer_out[BUFFER_SZ];
+    char name[32];
 
     // Client is connected or not?
     int leave_flag = 0;
@@ -125,18 +124,18 @@ void *handle_client(void *arg){
     client_t *cli = (client_t*)arg;
 
     //Name from the client
-    if(recv(cli->sockfd, name, NAME_LEN, 0) <= 0 || strlen(name) < 2 || strlen(name) >= NAME_LEN - 1){
+    if(recv(cli->sockfd, name, 32, 0) <= 0 || strlen(name) < 2 || strlen(name) >= 32 - 1){
         printf("ERROR: Please enter a valid name.\n");
         leave_flag = 1;
     } else {
         // Display that a client has joined
         strcpy(cli->name, name);
-        sprintf(buffer, "%s has joined\n", cli->name);
-        printf("%s", buffer);
-        send_message(buffer, cli->uid);
+        sprintf(buffer_out, "%s has joined\n", cli->name);
+        printf("%s", buffer_out);
+        send_message(buffer_out, cli->uid);
     }
 
-    bzero(buffer, BUFFER_SZ);
+    bzero(buffer_out, BUFFER_SZ);
 
     while (1)
     {
@@ -146,41 +145,40 @@ void *handle_client(void *arg){
 
         // ! TODO: Inactividad de usuario por un cierto tiempo
 
-        int receive = recv(cli->sockfd, buffer, BUFFER_SZ, 0);
+        int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
 
         if (receive > 0)
         {
-            if (strlen(buffer) > 0)
+            if (strlen(buffer_out) > 0)
             {
-                send_message(buffer, cli->uid);
-                str_trim_lf(buffer, strlen(buffer));
-                printf("%s -> %s", buffer, cli->name);
+                send_message(buffer_out, cli->uid);
+                str_trim_lf(buffer_out, strlen(buffer_out));
+                printf("%s -> %s", buffer_out, cli->name);
                 // ! TODO: Imprimir estatus del cliente
-            } else if (receive == 0 || strcmp(buffer, "exit") == 0)
-            {
-                // Send Message that a client has left
-                sprintf(buffer, "%s has left\n", cli->name);
-                printf("%s\n", buffer);
-                send_message(buffer, cli->uid);
-                leave_flag = 1;
-            } else {
-                printf("ERROR: -1\n");
-                leave_flag = 1;
-            }
-
-            // ! TODO: desplegar lista de usuario con el comando <show-users-list>
-            // !       en el if de arriba
-
-            // ! TODO: desplegar info de un usuario en  especifico
-            // !       con el comando <show-user-info nombre_usuario>
-            // !       en el if de arriba
-            // !       De donde ssale la IP?
-
-            // ! TODO: Desplegar ayuda con el comando <help>
-
-            bzero(buffer, BUFFER_SZ);
-
+            } 
+        } else if (receive == 0 || strcmp(buffer_out, "exit") == 0){
+            // Send Message that a client has left
+            sprintf(buffer_out, "%s has left\n", cli->name);
+            printf("%s\n", buffer_out);
+            send_message(buffer_out, cli->uid);
+            leave_flag = 1;
+        } else {
+            printf("ERROR: -1\n");
+            leave_flag = 1;
         }
+
+        // ! TODO: desplegar lista de usuario con el comando <show-users-list>
+        // !       en el if de arriba
+
+        // ! TODO: desplegar info de un usuario en  especifico
+        // !       con el comando <show-user-info nombre_usuario>
+        // !       en el if de arriba
+        // !       De donde ssale la IP?
+
+        // ! TODO: Desplegar ayuda con el comando <help>
+
+        bzero(buffer_out, BUFFER_SZ);
+
     }
 
     // * CLient has left
