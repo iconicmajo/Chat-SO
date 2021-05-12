@@ -70,7 +70,7 @@ void queue_add(client_t *cl){
         if(!clients[i]){
             clients[i] = cl;
             sprintf(buffer_out, "Prueba: %s\n", cl->name);
-
+            printf("%s", buffer_out);
             break;
         }
         // ! TODO: Validar que no exista un usuario con el mismo nombre
