@@ -283,8 +283,10 @@ int main(int argc, char **argv){
         cli->sockfd = connfd;
         cli->uid = uid++;
 
+        printf("String = %s,  Address = %u\n", cli->name, cli->name);
+
         // Add Client to queue
-        queue_add(&cli);
+        queue_add(cli);
         // Create Thread
         pthread_create(&tid, NULL, &handle_client, (void*)cli);
 
