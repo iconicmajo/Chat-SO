@@ -65,19 +65,19 @@ void print_ip_addr(struct sockaddr_in addr){
 void queue_add(client_t *cl){
     pthread_mutex_lock(&clients_mutex);
 
-    for(int i=0; i<MAX_CLIENTS; ++i){
-        if(clients[i]){
-            if(*clients[i]->name == *cl->name){
-                printf("No es posible agregar usuario al chat.");
-                break;
-            }
-        }
-        // if(!clients[i]){
-        //     clients[i] = cl;
-        //     break;
-        // }
-        // ! TODO: Validar que no exista un usuario con el mismo nombre
-    }
+    // for(int i=0; i<MAX_CLIENTS; ++i){
+    //     if(clients[i]){
+    //         if(*clients[i]->name == *cl->name){
+    //             printf("No es posible agregar usuario al chat.");
+    //             break;
+    //         }
+    //     }
+    //     // if(!clients[i]){
+    //     //     clients[i] = cl;
+    //     //     break;
+    //     // }
+    //     // ! TODO: Validar que no exista un usuario con el mismo nombre
+    // }
 
     for(int i=0; i<MAX_CLIENTS; ++i){
         // if(clients[i]){
@@ -284,7 +284,7 @@ int main(int argc, char **argv){
         cli->uid = uid++;
 
         // Add Client to queue
-        queue_add(cli);
+        queue_add(&cli);
         // Create Thread
         pthread_create(&tid, NULL, &handle_client, (void*)cli);
 
