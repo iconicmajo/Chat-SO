@@ -283,7 +283,7 @@ int main(int argc, char **argv){
         cli->sockfd = connfd;
         cli->uid = uid++;
 
-        printf("String = %s,  Address = %u\n", cli->name, cli->name);
+        printf("String = %s\n", cli->name);
 
         // Add Client to queue
         queue_add(cli);
