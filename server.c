@@ -79,6 +79,14 @@ void queue_add(client_t *cl){
     //     // ! TODO: Validar que no exista un usuario con el mismo nombre
     // }
 
+    
+    char buffer_out[BUFFER_SZ];
+    char name[32];
+
+    strcpy(cli->name, name);
+    sprintf(buffer_out, "%s prueba\n", cli->name);
+    printf("%s", buffer_out);
+
     for(int i=0; i<MAX_CLIENTS; ++i){
         // if(clients[i]){
         //     if(clients[i]->name == cl->name){
@@ -282,13 +290,6 @@ int main(int argc, char **argv){
         cli->address = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;
-
-        char buffer_out[BUFFER_SZ];
-        char name[32];
-
-        strcpy(cli->name, name);
-        sprintf(buffer_out, "%s prueba\n", cli->name);
-        printf("%s", buffer_out);
 
         // Add Client to queue
         queue_add(cli);
