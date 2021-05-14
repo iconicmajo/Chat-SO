@@ -41,7 +41,7 @@ typedef struct {
     int sockfd;
     int uid; // Unique for every client
     char name[32];
-    char status = ACTIVE_STATUS;
+    char status[32];
 } client_t, *client_t_ptr;
 
 client_t *clients[MAX_CLIENTS];
@@ -308,6 +308,7 @@ int main(int argc, char **argv){
         cli->address = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;
+        strcpy(cli->status, ACTIVE_STATUS);
 
         // Add Client to queue
         queue_add(cli);
