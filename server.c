@@ -41,7 +41,7 @@ typedef struct {
     int sockfd;
     int uid; // Unique for every client
     char name[32];
-    char status = ACTIVE_STATUS;
+    char status[32];
 } client_t, *client_t_ptr;
 
 client_t *clients[MAX_CLIENTS];
@@ -199,7 +199,7 @@ void *handle_client(void *arg){
             {
                 send_message(buffer_out, cli->uid);
                 str_trim_lf(buffer_out, strlen(buffer_out));
-                printf("[%s :: STATUS(%s)] -> %s", buffer_out, cli->name, cli->status);
+                printf("%s -> %s\n", buffer_out, cli->name, cli->status);
                 // ! TODO: Imprimir estatus del cliente
             } 
         } else if (receive == 0 || strcmp(buffer_out, "exit") == 0){
@@ -308,6 +308,7 @@ int main(int argc, char **argv){
         cli->address = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;
+	strcpy(cli->status, ACTIVE_STATUS);
 
         // Add Client to queue
         queue_add(cli);
