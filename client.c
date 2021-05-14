@@ -76,12 +76,13 @@ void send_msg_handler(){
 // * Receive Msg from server
 void recv_msg_handler(){
     char message[LENGTH] = {};
+    char error_msg = "Username already exists.\n";
     while(1){
         int receive = recv(sockfd, message, LENGTH, 0);
         if(receive > 0){// We receive something
             printf("%s ", message);
             str_overwrite_stdout();
-            bool test = "Username already exists.\n" == message;
+            bool test = error_msg == message;
             printf("Message EQ%d", test);
             if(message == "Username already exists.\n"){
                 break;
