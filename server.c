@@ -21,6 +21,7 @@ Osmin Josue Sagastume           18173
 #include <pthread.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <stdbool.h>
 
 #define MAX_CLIENTS 100
 #define BUFFER_SZ 2048
@@ -110,20 +111,24 @@ void send_message(char *s, int uid){
 }
 
 // * Validate if username does not exists yet
-void validate_user_name(client_t *cl){
-    pthread_mutex_lock(&clients_mutex);
+bool validate_user_name(client_t *cl){
+    //pthread_mutex_lock(&clients_mutex);
 
-    char cli_name = cli->name;
-    int cli_uid = cli->uid;
 
-    for(int i=0; i<MAX_CLIENTS; ++i){
-        if(clients[i]->name == cli_name && clients[i]->uid < cli_uid ){
-            printf("ERROR: ya existe el nombre de usuario %s\n", cli_name);
-            break;
-        }
+    for(int i=0; i<MAX_CLIENTS; i++){
+	if(clients[i]){
+        	if(*clients[i]->name == *cl->name){
+			if(clients[i]->uid < cl->uid){
+		            printf("Username (%s) already exists.\n", cl->name);
+	   		    return true;
+			}
+	        }
+	}
     }
 
-    pthread_mutex_unlock(&clients_mutex);
+	return false;
+
+    //pthread_mutex_unlock(&clients_mutex);
 }
 
 // * Main function
@@ -147,10 +152,14 @@ void *handle_client(void *arg){
         // Display that a client has joined
         strcpy(cli->name, name);
         // ! TODO: Validar que no exista un usuario con el mismo nombre
-        validate_user_name(cli);
-        sprintf(buffer_out, "%s has joined\n", cli->name);
-        printf("%s", buffer_out);
-        send_message(buffer_out, cli->uid);
+	bool user_name_exists = validate_user_name(cli);
+	if(!user_name_exists){
+	        sprintf(buffer_out, "%s has joined\n", cli->name);
+        	printf("%s", buffer_out);
+	        send_message(buffer_out, cli->uid);
+	} else {
+		leave_flag = 1;
+	}
     }
 
     bzero(buffer_out, BUFFER_SZ);
