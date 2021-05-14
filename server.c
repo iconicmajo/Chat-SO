@@ -35,7 +35,7 @@ typedef struct {
     int sockfd;
     int uid; // Unique for every client
     char name[32];
-} client_t;
+} client_t, *client_t_ptr;
 
 client_t *clients[MAX_CLIENTS];
 
