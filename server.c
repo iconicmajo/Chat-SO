@@ -26,6 +26,11 @@ Osmin Josue Sagastume           18173
 #define MAX_CLIENTS 100
 #define BUFFER_SZ 2048
 
+// * Status
+#define ACTIVE_STATUS "ACTIVE"
+#define BUSY_STATUS "BUSY"
+#define INACTIVE_STATUS "INACTIVE"
+
 // * Global Variable for Client Count
 static _Atomic unsigned int cli_count = 0;
 static int uid = 10;
@@ -36,6 +41,7 @@ typedef struct {
     int sockfd;
     int uid; // Unique for every client
     char name[32];
+    char status = ACTIVE_STATUS;
 } client_t, *client_t_ptr;
 
 client_t *clients[MAX_CLIENTS];
@@ -129,23 +135,17 @@ void kick_user_out(char *s, int uid){
 
 // * Validate if username does not exists yet
 bool validate_user_name(client_t *cl){
-    //pthread_mutex_lock(&clients_mutex);
-
-
     for(int i=0; i<MAX_CLIENTS; i++){
-	if(clients[i]){
-        	if(*clients[i]->name == *cl->name){
-			if(clients[i]->uid < cl->uid){
-		            printf("Username (%s) already exists.\n", cl->name);
-	   		    return true;
-			}
-	        }
-	}
+        if(clients[i]){
+                if(*clients[i]->name == *cl->name){
+                    if(clients[i]->uid < cl->uid){// Print in server that users with provided name already exists
+                        printf("Username (%s) already exists.\n", cl->name);
+                        return true;
+                    }
+                }
+        }
     }
-
 	return false;
-
-    //pthread_mutex_unlock(&clients_mutex);
 }
 
 // * Main function
@@ -168,17 +168,17 @@ void *handle_client(void *arg){
     } else {
         // Display that a client has joined
         strcpy(cli->name, name);
-        // ! TODO: Validar que no exista un usuario con el mismo nombre
-	bool user_name_exists = validate_user_name(cli);
-	if(!user_name_exists){
-	        sprintf(buffer_out, "%s has joined\n", cli->name);
-        	printf("%s", buffer_out);
-	        send_message(buffer_out, cli->uid);
-	} else {
-        sprintf(buffer_out, "Username already exists.\n", cli->name);
-        kick_user_out(buffer_out, cli->uid);
-		leave_flag = 1;
-	}
+        // * Validar que no exista un usuario con el mismo nombre
+        bool user_name_exists = validate_user_name(cli);
+        if(!user_name_exists){// If username does not exists
+            sprintf(buffer_out, "%s has joined\n", cli->name);
+            printf("%s", buffer_out);
+            send_message(buffer_out, cli->uid);
+        } else {// If username exists
+            sprintf(buffer_out, "Username already exists.\n", cli->name);
+            kick_user_out(buffer_out, cli->uid);
+            leave_flag = 1;
+        }
     }
 
     bzero(buffer_out, BUFFER_SZ);
@@ -199,7 +199,7 @@ void *handle_client(void *arg){
             {
                 send_message(buffer_out, cli->uid);
                 str_trim_lf(buffer_out, strlen(buffer_out));
-                printf("%s -> %s", buffer_out, cli->name);
+                printf("[%s :: STATUS(%s)] -> %s", buffer_out, cli->name, cli->status);
                 // ! TODO: Imprimir estatus del cliente
             } 
         } else if (receive == 0 || strcmp(buffer_out, "exit") == 0){
@@ -285,7 +285,7 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
-    printf("=== Welcome to Chatroom === \n");
+    printf("\n\t=== Welcome to Chatroom === \n");
 
     // ! TODO: imprimir instrucciones de uso
 
