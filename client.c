@@ -80,8 +80,9 @@ void recv_msg_handler(){
         if(receive > 0){// We receive something
             printf("%s ", message);
             str_overwrite_stdout();
-        } else if(message == "Username already exists\n"){
-            break;
+            if(message == "Username already exists.\n"){
+                break;
+            }
         } else if(receive == 0){ // Error
             break;
         }
