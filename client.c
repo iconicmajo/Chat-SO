@@ -20,6 +20,7 @@ Osmin Josue Sagastume           18173
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <stdbool.h>
 
 #define LENGTH 2048
 
@@ -80,6 +81,8 @@ void recv_msg_handler(){
         if(receive > 0){// We receive something
             printf("%s ", message);
             str_overwrite_stdout();
+            bool test = "Username already exists.\n" == message;
+            printf("Message EQ%d", test);
             if(message == "Username already exists.\n"){
                 break;
             }
