@@ -110,6 +110,23 @@ void send_message(char *s, int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
+// * Send message to specific client
+void kick_user_out(char *s, int uid){
+    pthread_mutex_lock(&clients_mutex);
+
+    for(int i=0; i<MAX_CLIENTS; ++i){
+        if(clients[i]){
+            if(clients[i]->uid == uid){
+                if(write(clients[i]-> sockfd, s, strlen(s)) < 0){
+                    break;
+                }
+            }
+        }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
+}
+
 // * Validate if username does not exists yet
 bool validate_user_name(client_t *cl){
     //pthread_mutex_lock(&clients_mutex);
@@ -158,6 +175,8 @@ void *handle_client(void *arg){
         	printf("%s", buffer_out);
 	        send_message(buffer_out, cli->uid);
 	} else {
+        sprintf(buffer_out, "Username already exists.\n", cli->name);
+        kick_user_out(buffer_out, cli->uid);
 		leave_flag = 1;
 	}
     }
