@@ -80,12 +80,12 @@ void queue_add(client_t *cl){
     // }
 
     
-    char buffer_out[BUFFER_SZ];
-    char name[32];
+    // char buffer_out[BUFFER_SZ];
+    // char name[32];
 
-    strcpy(cli->name, name);
-    sprintf(buffer_out, "%s prueba\n", cli->name);
-    printf("%s", buffer_out);
+    // strcpy(cl->name, name);
+    // sprintf(buffer_out, "%s prueba\n", cl->name);
+    // printf("Addres of cl->name %x", cl);
 
     for(int i=0; i<MAX_CLIENTS; ++i){
         // if(clients[i]){
@@ -290,6 +290,9 @@ int main(int argc, char **argv){
         cli->address = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;
+
+	// printf("Prueba en main: %d\n", uid);
+	// printf("Prueba en main: %d\n", cli->uid);
 
         // Add Client to queue
         queue_add(cli);
