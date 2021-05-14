@@ -65,40 +65,11 @@ void print_ip_addr(struct sockaddr_in addr){
 void queue_add(client_t *cl){
     pthread_mutex_lock(&clients_mutex);
 
-    // for(int i=0; i<MAX_CLIENTS; ++i){
-    //     if(clients[i]){
-    //         if(*clients[i]->name == *cl->name){
-    //             printf("No es posible agregar usuario al chat.");
-    //             break;
-    //         }
-    //     }
-    //     // if(!clients[i]){
-    //     //     clients[i] = cl;
-    //     //     break;
-    //     // }
-    //     // ! TODO: Validar que no exista un usuario con el mismo nombre
-    // }
-
-    
-    // char buffer_out[BUFFER_SZ];
-    // char name[32];
-
-    // strcpy(cl->name, name);
-    // sprintf(buffer_out, "%s prueba\n", cl->name);
-    // printf("Addres of cl->name %x", cl);
-
     for(int i=0; i<MAX_CLIENTS; ++i){
-        // if(clients[i]){
-        //     if(clients[i]->name == cl->name){
-        //         printf("No es posible agregar usuario al chat.")
-        //         return;
-        //     }
-        // }
         if(!clients[i]){
             clients[i] = cl;
             break;
         }
-        // ! TODO: Validar que no exista un usuario con el mismo nombre
     }
 
     pthread_mutex_unlock(&clients_mutex);
@@ -138,6 +109,23 @@ void send_message(char *s, int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
+// * Validate if username does not exists yet
+void validate_user_name(client_t *cl){
+    pthread_mutex_lock(&clients_mutex);
+
+    char cli_name = cli->name;
+    int cli_uid = cli->uid;
+
+    for(int i=0; i<MAX_CLIENTS; ++i){
+        if(clients[i]->name == cli_name && clients[i]->uid < cli_uid ){
+            printf("ERROR: ya existe el nombre de usuario %s\n", cli_name);
+            break;
+        }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
+}
+
 // * Main function
 void *handle_client(void *arg){
     char buffer_out[BUFFER_SZ];
@@ -158,6 +146,8 @@ void *handle_client(void *arg){
     } else {
         // Display that a client has joined
         strcpy(cli->name, name);
+        // ! TODO: Validar que no exista un usuario con el mismo nombre
+        validate_user_name(cli);
         sprintf(buffer_out, "%s has joined\n", cli->name);
         printf("%s", buffer_out);
         send_message(buffer_out, cli->uid);
@@ -290,9 +280,6 @@ int main(int argc, char **argv){
         cli->address = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;
-
-	// printf("Prueba en main: %d\n", uid);
-	// printf("Prueba en main: %d\n", cli->uid);
 
         // Add Client to queue
         queue_add(cli);
