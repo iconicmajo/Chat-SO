@@ -66,10 +66,13 @@ void send_msg_handler(){
         char* token = strtok(message, " ");
 
         if (strcmp(token, "exit") == 0)
-        {
+        {// Exit chat
             break;
-        } else if(strcmp(token, "change-status") == 0){
-            printf("Entra al if del change-status\n");
+        } else if(strcmp(token, "change-status") == 0){//Change Status
+            token = strtok(NULL, " "); // Second "Parameter"
+            if(strcmp(token, ACTIVE_STATUS) == 0 || strcmp(token, BUSY_STATUS) == 0 || strcmp(token, INACTIVE_STATUS) == 0){// Chose one of the available statuses
+                status = token;
+            }
         } else {
             sprintf(buffer, "[%s::Status(%s)] %s\n", name, status, message);
             send(sockfd, buffer, strlen(buffer), 0);
