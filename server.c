@@ -199,7 +199,7 @@ void *handle_client(void *arg){
             {
                 send_message(buffer_out, cli->uid);
                 str_trim_lf(buffer_out, strlen(buffer_out));
-                printf("[%s :: STATUS(%s)] -> %s", buffer_out, cli->name, cli->status);
+                printf("%s -> %s\n", buffer_out, cli->name, cli->status);
                 // ! TODO: Imprimir estatus del cliente
             } 
         } else if (receive == 0 || strcmp(buffer_out, "exit") == 0){

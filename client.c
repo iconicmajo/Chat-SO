@@ -24,9 +24,15 @@ Osmin Josue Sagastume           18173
 
 #define LENGTH 2048
 
+// * Status
+#define ACTIVE_STATUS "ACTIVE"
+#define BUSY_STATUS "BUSY"
+#define INACTIVE_STATUS "INACTIVE"
+
 volatile sig_atomic_t flag = 0;
 int sockfd = 0;
 char name[32];
+char status[32];
 
 void str_overwrite_stdout(){
     printf("\r%s", "> ");
@@ -60,7 +66,7 @@ void send_msg_handler(){
         {
             break;
         } else {
-            sprintf(buffer, "%s: %s\n", name, message);
+            sprintf(buffer, "[%s::Status(%s)] %s\n", name, status, message);
             send(sockfd, buffer, strlen(buffer), 0);
         }
 
@@ -123,6 +129,9 @@ int main(int argc, char **argv){
     serv_addr.sin_addr.s_addr = inet_addr(ip);
     serv_addr.sin_port = htons(port);
 
+    // Status
+    strcpy(status, ACTIVE_STATUS);
+
     // Connect client to server
     int err = connect(sockfd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
     if(err == -1){
@@ -131,6 +140,7 @@ int main(int argc, char **argv){
     }
 
     // Send client's Name
+    // ! TODO: Send clients name and status with protobuf protocol
     send(sockfd, name, 32, 0);
     
     printf("=== Welcome to Chatroom === \n");
