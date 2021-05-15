@@ -206,12 +206,13 @@ void *handle_client(void *arg){
 
     bzero(buffer_out, BUFFER_SZ);
 
+    printf("Buffer: %s\n", buffer_out);
+
     // Make copy of buffer
     char buffer_out_copy[BUFFER_SZ] = {};
     strcpy(buffer_out_copy, buffer_out);
 
     char* token = strtok(buffer_out_copy, " ");
-	printf("Buffer cpy: %s\n", buffer_out_copy);
 
     while (1)
     {
