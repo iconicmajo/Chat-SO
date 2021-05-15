@@ -174,6 +174,7 @@ bool validate_user_name(client_t *cl){
 // * Main function
 void *handle_client(void *arg){
     char buffer_out[BUFFER_SZ];
+    char buffer_out_copy[BUFFER_SZ];
     char name[32];
 
     // Client is connected or not?
@@ -207,11 +208,10 @@ void *handle_client(void *arg){
     bzero(buffer_out, BUFFER_SZ);
 
     // Make copy of buffer
-    char buffer_out_copy[BUFFER_SZ] = {};
     strcpy(buffer_out_copy, buffer_out);
 
+    printf("Buffer cpy: %s\n", buffer_out_copy);
     char* token = strtok(buffer_out_copy, " ");
-	printf("Buffer cpy: %s\n", buffer_out_copy);
 
     while (1)
     {
