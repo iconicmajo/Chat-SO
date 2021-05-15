@@ -68,6 +68,8 @@ void send_msg_handler(){
         if (strcmp(token, "exit") == 0)
         {
             break;
+        } else if(strcmp(token, "change-status") == 0){
+            printf("Entra al if del change-status\n");
         } else {
             sprintf(buffer, "[%s::Status(%s)] %s\n", name, status, message);
             send(sockfd, buffer, strlen(buffer), 0);
