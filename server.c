@@ -116,6 +116,29 @@ void send_message(char *s, int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
+// * Display users list
+void display_users_list(int uid){
+    pthread_mutex_lock(&clients_mutex);
+
+
+
+    for(int i=0; i<MAX_CLIENTS; ++i){
+        if(clients[i]){
+            if(clients[i]->uid == uid){ // We found the user is making the request
+                for(int j=0; j<MAX_CLIENTS; ++j){
+                    if(clients[j] && (clients[j]->uid != uid)){
+                        if(write(clients[i]-> sockfd, clients[j]->name, strlen(clients[j]->name)) < 0){
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
+}
+
 // * Send message to specific client
 void kick_user_out(char *s, int uid){
     pthread_mutex_lock(&clients_mutex);
@@ -183,6 +206,12 @@ void *handle_client(void *arg){
 
     bzero(buffer_out, BUFFER_SZ);
 
+    // Make copy of buffer
+    char buffer_out_copy[BUFFER_SZ] = {};
+    strcpy(buffer_out_copy, buffer_out);
+
+    char* token = strtok(buffer_out_copy, " ");
+
     while (1)
     {
         if(leave_flag){
@@ -200,14 +229,17 @@ void *handle_client(void *arg){
                 send_message(buffer_out, cli->uid);
                 str_trim_lf(buffer_out, strlen(buffer_out));
                 printf("%s -> %s\n", buffer_out, cli->name, cli->status);
-                // ! TODO: Imprimir estatus del cliente
             } 
-        } else if (receive == 0 || strcmp(buffer_out, "exit") == 0){
+        } else if (receive == 0 || strcmp(buffer_out_copy, "exit") == 0){
             // Send Message that a client has left
             sprintf(buffer_out, "%s has left\n", cli->name);
             printf("%s\n", buffer_out);
             send_message(buffer_out, cli->uid);
             leave_flag = 1;
+        } else if(strcmp(buffer_out_copy, "show-users-list") == 0){
+            // * Display users list
+            printf("Llega\n")
+            display_users_list(cli->uid);
         } else {
             printf("ERROR: -1\n");
             leave_flag = 1;
