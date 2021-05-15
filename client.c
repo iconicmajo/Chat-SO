@@ -56,12 +56,15 @@ void catch_ctrl_c_and_exit(int sig){
 // * Send Msg
 void send_msg_handler(){
     char message[LENGTH] = {};
+    char message_copy[LENGTH] = {};
     char buffer[LENGTH + 32] = {};
     while (1)
     {
         str_overwrite_stdout();
         fgets(message, LENGTH, stdin);
         str_trim_lf(message, LENGTH);
+
+        strcpy(message_copy, message);
 
         char* token = strtok(message, " ");
 
@@ -74,7 +77,7 @@ void send_msg_handler(){
                 status = token;
             }
         } else {
-            sprintf(buffer, "[%s::Status(%s)] %s\n", name, status, message);
+            sprintf(buffer, "[%s::Status(%s)] %s\n", name, status, message_copy);
             send(sockfd, buffer, strlen(buffer), 0);
         }
 
