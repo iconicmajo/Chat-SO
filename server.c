@@ -207,6 +207,8 @@ void *handle_client(void *arg){
 
     bzero(buffer_out, BUFFER_SZ);
 
+    printf("Buffer: %s\n", buffer_out);
+
     // Make copy of buffer
     strcpy(buffer_out_copy, buffer_out);
 
