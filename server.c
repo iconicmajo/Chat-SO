@@ -207,15 +207,6 @@ void *handle_client(void *arg){
 
     bzero(buffer_out, BUFFER_SZ);
 
-    printf("Buffer: %s\n", buffer_out);
-
-    // Make copy of buffer
-    strcpy(buffer_out_copy, buffer_out);
-
-    printf("Buffer cpy: %s\n", buffer_out_copy);
-    char* token = strtok(buffer_out_copy, " ");
-    pinrtf("Token %s\n", token);
-
     while (1)
     {
         if(leave_flag){
@@ -223,6 +214,15 @@ void *handle_client(void *arg){
         }
 
         // ! TODO: Inactividad de usuario por un cierto tiempo
+
+        printf("Buffer: %s\n", buffer_out);
+
+        // Make copy of buffer
+        strcpy(buffer_out_copy, buffer_out);
+
+        printf("Buffer cpy: %s\n", buffer_out_copy);
+        char* token = strtok(buffer_out_copy, " ");
+        printf("Token %s\n", token);
 
         int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
 
