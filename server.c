@@ -211,6 +211,7 @@ void *handle_client(void *arg){
     strcpy(buffer_out_copy, buffer_out);
 
     char* token = strtok(buffer_out_copy, " ");
+//	printf("Buffer cpy: %s", buffer_out_copy);
 
     while (1)
     {
@@ -238,8 +239,8 @@ void *handle_client(void *arg){
             leave_flag = 1;
         } else if(strcmp(buffer_out_copy, "show-users-list") == 0){
             // * Display users list
-            printf("Llega\n")
-            display_users_list(cli->uid);
+            printf("Llega\n");
+            //display_users_list(cli->uid);
         } else {
             printf("ERROR: -1\n");
             leave_flag = 1;
