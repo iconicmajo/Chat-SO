@@ -62,7 +62,10 @@ void send_msg_handler(){
         str_overwrite_stdout();
         fgets(message, LENGTH, stdin);
         str_trim_lf(message, LENGTH);
-        if (strcmp(message, "exit") == 0)
+
+        char* token = strtok(message, " ");
+
+        if (strcmp(token, "exit") == 0)
         {
             break;
         } else {
