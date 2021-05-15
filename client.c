@@ -71,7 +71,7 @@ void send_msg_handler(){
         } else if(strcmp(token, "change-status") == 0){//Change Status
             token = strtok(NULL, " "); // Second "Parameter"
             if(strcmp(token, ACTIVE_STATUS) == 0 || strcmp(token, BUSY_STATUS) == 0 || strcmp(token, INACTIVE_STATUS) == 0){// Chose one of the available statuses
-                status = token;
+                strcpy(status, token);
             }
         } else {
             sprintf(buffer, "[%s::Status(%s)] %s\n", name, status, message);
