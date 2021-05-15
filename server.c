@@ -214,6 +214,7 @@ void *handle_client(void *arg){
 
     printf("Buffer cpy: %s\n", buffer_out_copy);
     char* token = strtok(buffer_out_copy, " ");
+    pinrtf("Token %s\n", token);
 
     while (1)
     {
