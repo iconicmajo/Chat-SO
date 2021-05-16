@@ -116,6 +116,24 @@ void send_message(char *s, int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
+// * Display specific user info
+void display_user_info(int sockfd, int uid, char *token){
+    pthread_mutex_lock(&clients_mutex);
+    
+    for(int i=0; i<MAX_CLIENTS; i++){
+        if(clients[i]){
+            if((clients[i]->uid != uid) && (strcmp(clients[i]->uid, token) == 0)){
+                char buffer_out[BUFFER_SZ];
+                sprintf(buffer_out, "%d.%d.%d.%d", clients[i]->address.sin_addr.s_addr & 0xff, (clients[i]->address.sin_addr.s_addr & 0xff00) >> 8, (clients[i]->address.sin_addr.s_addr & 0xff0000) >> 16, (clients[i]->address.sin_addr.s_addr & 0xff000000) >> 24);
+                if(write(sockfd, buffer_out, strlen(buffer_out)) < 0){
+                    break;
+                }
+            }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
+}
+
 // * Display users list
 void display_users_list(int sockfd, int uid){
     pthread_mutex_lock(&clients_mutex);
@@ -124,10 +142,8 @@ void display_users_list(int sockfd, int uid){
     if(write(sockfd, title, strlen(title)) > 0){
 	    for(int i=0; i<MAX_CLIENTS; i++){
         	if(clients[i] && (clients[i]->uid != uid)){
-		    //char user_name[1024] = "User name -> ";
 		    char name[32];
 		    strcpy(name, clients[i]->name);
-		    //strcat(user_name, name);
 		    strcat(name, "\n");
         	    if(write(sockfd, name, strlen(name)) < 0){
                 	break;
@@ -222,6 +238,7 @@ void *handle_client(void *arg){
 
         char* token = strtok(buffer_out_copy, " ");
         char* show_users_list = "show-users";
+        char* show_users_info = "show-user-info";
         token = strtok(NULL, " "); // Second "Parameter"
 
         // * Remove \n to \0
@@ -231,17 +248,20 @@ void *handle_client(void *arg){
         {
             if (strlen(buffer_out) > 0)
             {
-                 if(strcmp(token, show_users_list) == 0){
-                    printf("Llega\n");
+                 if(strcmp(token, show_users_list) == 0){// Desplegar listado de usuarios
                     // * Display users list
                     display_users_list(cli->sockfd, cli->uid);
+                } else if(strcmp(token, show_users_info) == 0){
+                    // * Display specific user info
+                    token = strtok(NULL, " "); // Third "Parameter" should be the name
+                    display_user_info(cli->sockfd, cli->uid, token);
                 } else {
 	                send_message(buffer_out, cli->uid);
         	        str_trim_lf(buffer_out, strlen(buffer_out));
                 	printf("%s -> %s\n", buffer_out, cli->name, cli->status);
                 }
             }
-        } else if (receive == 0 || strcmp(buffer_out_copy, "exit") == 0){
+        } else if (receive == 0 || strcmp(buffer_out, "exit") == 0){
             // Send Message that a client has left
             sprintf(buffer_out, "%s has left\n", cli->name);
             printf("%s\n", buffer_out);
@@ -251,9 +271,6 @@ void *handle_client(void *arg){
             printf("ERROR: -1\n");
             leave_flag = 1;
         }
-
-        // ! TODO: desplegar lista de usuario con el comando <show-users-list>
-        // !       en el if de arriba
 
         // ! TODO: desplegar info de un usuario en  especifico
         // !       con el comando <show-user-info nombre_usuario>
