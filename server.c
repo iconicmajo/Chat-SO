@@ -120,12 +120,20 @@ void send_message(char *s, int uid){
 void display_users_list(int sockfd, int uid){
     pthread_mutex_lock(&clients_mutex);
 
-    for(int i=0; i<MAX_CLIENTS; i++){
-        if(clients[i] && (clients[i]->uid != uid)){
-            if(write(sockfd, clients[i]->name, strlen(clients[i]->name)) < 0){
-                break;
-            }
-        }
+    char* title = "Connected users list: \n";
+    if(write(sockfd, title, strlen(title)) > 0){
+	    for(int i=0; i<MAX_CLIENTS; i++){
+        	if(clients[i] && (clients[i]->uid != uid)){
+		    //char user_name[1024] = "User name -> ";
+		    char name[32];
+		    strcpy(name, clients[i]->name);
+		    //strcat(user_name, name);
+		    strcat(name, "\n");
+        	    if(write(sockfd, name, strlen(name)) < 0){
+                	break;
+	            }
+        	}
+	    }
     }
 
     pthread_mutex_unlock(&clients_mutex);
