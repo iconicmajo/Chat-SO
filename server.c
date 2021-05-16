@@ -215,6 +215,8 @@ void *handle_client(void *arg){
 
         // ! TODO: Inactividad de usuario por un cierto tiempo
 
+        int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
+
         printf("Buffer: %s\n", buffer_out);
 
         // Make copy of buffer
@@ -223,8 +225,6 @@ void *handle_client(void *arg){
         printf("Buffer cpy: %s\n", buffer_out_copy);
         char* token = strtok(buffer_out_copy, " ");
         printf("Token %s\n", token);
-
-        int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
 
         if (receive > 0)
         {
