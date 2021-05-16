@@ -217,28 +217,38 @@ void *handle_client(void *arg){
 
         int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
 
-        printf("Buffer: %s\n", buffer_out);
+//        printf("Buffer: %s\n", buffer_out);
 
         // Make copy of buffer
         strcpy(buffer_out_copy, buffer_out);
 
-        printf("Buffer cpy: %s\n", buffer_out_copy);
+//        printf("Buffer cpy: %s\n", buffer_out_copy);
         char* token = strtok(buffer_out_copy, " ");
-        printf("Token %s\n", token);
+	char* show_users_list = "show-users";
+	token = strtok(NULL, " "); // Second "Parameter"
+//        printf("Token %s\n", token);
+//	printf("Token %s\n", show_users_list);
+
+//	int test = strcmp(&token, &show_users_list);
+//	printf("Test: %d\n", test);
+
+	// * Remove \n to \0
+	str_trim_lf(token, strlen(token));
 
         if (receive > 0)
         {
             if (strlen(buffer_out) > 0)
             {
-                 printf("Llega\n");
-                 if(strcmp(buffer_out_copy, "show-users-list") == 0){
+                 if(strcmp(token, show_users_list) == 0){
+                    printf("Llega\n");
                     // * Display users list
                     display_users_list(cli->uid);
-                }
-                send_message(buffer_out, cli->uid);
-                str_trim_lf(buffer_out, strlen(buffer_out));
-                printf("%s -> %s\n", buffer_out, cli->name, cli->status);
-            } 
+                } else {
+	                send_message(buffer_out, cli->uid);
+        	        str_trim_lf(buffer_out, strlen(buffer_out));
+                	printf("%s -> %s\n", buffer_out, cli->name, cli->status);
+		}
+            }
         } else if (receive == 0 || strcmp(buffer_out_copy, "exit") == 0){
             // Send Message that a client has left
             sprintf(buffer_out, "%s has left\n", cli->name);
