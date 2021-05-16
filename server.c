@@ -122,13 +122,15 @@ void display_user_info(int sockfd, int uid, char *token){
     
     for(int i=0; i<MAX_CLIENTS; i++){
         if(clients[i]){
-            if((clients[i]->uid != uid) && (strcmp(clients[i]->uid, token) == 0)){
+            if((strcmp(clients[i]->name, token) == 0)){
                 char buffer_out[BUFFER_SZ];
                 sprintf(buffer_out, "%d.%d.%d.%d", clients[i]->address.sin_addr.s_addr & 0xff, (clients[i]->address.sin_addr.s_addr & 0xff00) >> 8, (clients[i]->address.sin_addr.s_addr & 0xff0000) >> 16, (clients[i]->address.sin_addr.s_addr & 0xff000000) >> 24);
+		strcat(buffer_out, "\n");
                 if(write(sockfd, buffer_out, strlen(buffer_out)) < 0){
                     break;
                 }
             }
+    	}
     }
 
     pthread_mutex_unlock(&clients_mutex);
@@ -254,6 +256,8 @@ void *handle_client(void *arg){
                 } else if(strcmp(token, show_users_info) == 0){
                     // * Display specific user info
                     token = strtok(NULL, " "); // Third "Parameter" should be the name
+		    printf("Username: %s\n", token);
+		    str_trim_lf(token, strlen(token));
                     display_user_info(cli->sockfd, cli->uid, token);
                 } else {
 	                send_message(buffer_out, cli->uid);
