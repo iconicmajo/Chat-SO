@@ -117,21 +117,13 @@ void send_message(char *s, int uid){
 }
 
 // * Display users list
-void display_users_list(int uid){
+void display_users_list(int sockfd, int uid){
     pthread_mutex_lock(&clients_mutex);
 
-
-
-    for(int i=0; i<MAX_CLIENTS; ++i){
-        if(clients[i]){
-            if(clients[i]->uid == uid){ // We found the user is making the request
-                for(int j=0; j<MAX_CLIENTS; ++j){
-                    if(clients[j] && (clients[j]->uid != uid)){
-                        if(write(clients[i]-> sockfd, clients[j]->name, strlen(clients[j]->name)) < 0){
-                            break;
-                        }
-                    }
-                }
+    for(int i=0; i<MAX_CLIENTS; i++){
+        if(clients[i] && (clients[i]->uid != uid)){
+            if(write(sockfd, clients[i]->name, strlen(clients[i]->name)) < 0){
+                break;
             }
         }
     }
@@ -217,23 +209,15 @@ void *handle_client(void *arg){
 
         int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
 
-//        printf("Buffer: %s\n", buffer_out);
-
         // Make copy of buffer
         strcpy(buffer_out_copy, buffer_out);
 
-//        printf("Buffer cpy: %s\n", buffer_out_copy);
         char* token = strtok(buffer_out_copy, " ");
-	char* show_users_list = "show-users";
-	token = strtok(NULL, " "); // Second "Parameter"
-//        printf("Token %s\n", token);
-//	printf("Token %s\n", show_users_list);
+        char* show_users_list = "show-users";
+        token = strtok(NULL, " "); // Second "Parameter"
 
-//	int test = strcmp(&token, &show_users_list);
-//	printf("Test: %d\n", test);
-
-	// * Remove \n to \0
-	str_trim_lf(token, strlen(token));
+        // * Remove \n to \0
+        str_trim_lf(token, strlen(token));
 
         if (receive > 0)
         {
@@ -242,12 +226,12 @@ void *handle_client(void *arg){
                  if(strcmp(token, show_users_list) == 0){
                     printf("Llega\n");
                     // * Display users list
-                    display_users_list(cli->uid);
+                    display_users_list(cli->sockfd, cli->uid);
                 } else {
 	                send_message(buffer_out, cli->uid);
         	        str_trim_lf(buffer_out, strlen(buffer_out));
                 	printf("%s -> %s\n", buffer_out, cli->name, cli->status);
-		}
+                }
             }
         } else if (receive == 0 || strcmp(buffer_out_copy, "exit") == 0){
             // Send Message that a client has left
