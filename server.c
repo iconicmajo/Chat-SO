@@ -230,9 +230,9 @@ void *handle_client(void *arg){
         {
             if (strlen(buffer_out) > 0)
             {
+                 printf("Llega\n");
                  if(strcmp(buffer_out_copy, "show-users-list") == 0){
                     // * Display users list
-                    printf("Llega\n");
                     display_users_list(cli->uid);
                 }
                 send_message(buffer_out, cli->uid);
