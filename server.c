@@ -116,6 +116,35 @@ void send_message(char *s, int uid){
     pthread_mutex_unlock(&clients_mutex);
 }
 
+// * Send Msg to specific client
+void send_message_to_user(char *s, char *name){
+    pthread_mutex_lock(&clients_mutex);
+
+    for(int i=0; i<MAX_CLIENTS; ++i){
+        if(clients[i]){
+            if(*clients[i]->name == *name){
+                if(write(clients[i]-> sockfd, s, strlen(s)) < 0){
+                    break;
+                }
+            }
+        }
+    }
+
+    pthread_mutex_unlock(&clients_mutex);
+}
+
+// * Validate if username exists
+bool is_in_users(char *name){
+    for(int i=0; i<MAX_CLIENTS; i++){
+        if(clients[i]){
+                if(*clients[i]->name == *name){
+                        return true;
+                }
+        }
+    }
+	return false;
+}
+
 // * Display specific user info
 void display_user_info(int sockfd, int uid, char *token){
     pthread_mutex_lock(&clients_mutex);
@@ -125,7 +154,7 @@ void display_user_info(int sockfd, int uid, char *token){
             if((strcmp(clients[i]->name, token) == 0)){
                 char buffer_out[BUFFER_SZ];
                 sprintf(buffer_out, "%d.%d.%d.%d", clients[i]->address.sin_addr.s_addr & 0xff, (clients[i]->address.sin_addr.s_addr & 0xff00) >> 8, (clients[i]->address.sin_addr.s_addr & 0xff0000) >> 16, (clients[i]->address.sin_addr.s_addr & 0xff000000) >> 24);
-		strcat(buffer_out, "\n");
+		        strcat(buffer_out, "\n");
                 if(write(sockfd, buffer_out, strlen(buffer_out)) < 0){
                     break;
                 }
@@ -255,14 +284,19 @@ void *handle_client(void *arg){
                     display_users_list(cli->sockfd, cli->uid);
                 } else if(strcmp(token, show_users_info) == 0){
                     // * Display specific user info
-                    token = strtok(NULL, " "); // Third "Parameter" should be the name
-		    printf("Username: %s\n", token);
-		    str_trim_lf(token, strlen(token));
+                    token = strtok(NULL, " "); // Third "Parameter" should be the username
+                    str_trim_lf(token, strlen(token));
                     display_user_info(cli->sockfd, cli->uid, token);
                 } else {
-	                send_message(buffer_out, cli->uid);
-        	        str_trim_lf(buffer_out, strlen(buffer_out));
-                	printf("%s -> %s\n", buffer_out, cli->name, cli->status);
+                    // * Validate if message is for specific user 
+                    token = strtok(NULL, " "); // Third "Parameter" should be the username
+                    if(is_in_users(token)){
+                        send_message_to_user(buffer_out, token);
+                    } else {
+                        send_message(buffer_out, cli->uid);
+                        str_trim_lf(buffer_out, strlen(buffer_out));
+                        printf("%s -> %s\n", buffer_out, cli->name, cli->status);
+                    }
                 }
             }
         } else if (receive == 0 || strcmp(buffer_out, "exit") == 0){
@@ -275,11 +309,6 @@ void *handle_client(void *arg){
             printf("ERROR: -1\n");
             leave_flag = 1;
         }
-
-        // ! TODO: desplegar info de un usuario en  especifico
-        // !       con el comando <show-user-info nombre_usuario>
-        // !       en el if de arriba
-        // !       De donde ssale la IP?
 
         // ! TODO: Desplegar ayuda con el comando <help>
 
