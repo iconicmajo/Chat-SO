@@ -129,8 +129,9 @@ void display_user_info(int sockfd, int uid, char *token){
                     break;
                 }
             }
+        }
     }
-
+    
     pthread_mutex_unlock(&clients_mutex);
 }
 
