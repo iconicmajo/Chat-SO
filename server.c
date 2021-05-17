@@ -291,7 +291,6 @@ void *handle_client(void *arg){
                     display_user_info(cli->sockfd, cli->uid, token);
                 } else if(strcmp(token, "exit") == 0){
                     // Send Message that a client has left
-		            printf("Llega If");
                     sprintf(buffer_out, "%s has left\n", cli->name);
                     printf("%s\n", buffer_out);
                     send_message(buffer_out, cli->uid);
@@ -309,7 +308,6 @@ void *handle_client(void *arg){
             }
         } else if (receive == 0){
             // Send Message that a client has left
-	    printf("Llega al else\n");
             sprintf(buffer_out, "%s has left\n", cli->name);
             printf("%s\n", buffer_out);
             send_message(buffer_out, cli->uid);
