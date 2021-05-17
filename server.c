@@ -122,7 +122,7 @@ void send_message_to_user(char *s, char *name){
 
     for(int i=0; i<MAX_CLIENTS; ++i){
         if(clients[i]){
-            if(*clients[i]->name == *name){
+            if(strcmp(clients[i]->name, name) == 0){
                 if(write(clients[i]-> sockfd, s, strlen(s)) < 0){
                     break;
                 }
