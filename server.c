@@ -135,9 +135,9 @@ void send_message_to_user(char *s, char *name){
 
 // * Validate if username exists
 bool is_in_users(char *name){
-    for(int i=0; i<MAX_CLIENTS; i++){
+    for(int i=0; i<MAX_CLIENTS; ++i){
         if(clients[i]){
-                if(*clients[i]->name == *name){
+                if(strcmp(clients[i]->name, name) == 0){
                         return true;
                 }
         }
@@ -207,7 +207,7 @@ void kick_user_out(char *s, int uid){
 bool validate_user_name(client_t *cl){
     for(int i=0; i<MAX_CLIENTS; i++){
         if(clients[i]){
-                if(*clients[i]->name == *cl->name){
+                if(strcmp(clients[i]->name, cl->name) == 0){
                     if(clients[i]->uid < cl->uid){// Print in server that users with provided name already exists
                         printf("Username (%s) already exists.\n", cl->name);
                         return true;
@@ -289,7 +289,6 @@ void *handle_client(void *arg){
                     display_user_info(cli->sockfd, cli->uid, token);
                 } else {
                     // * Validate if message is for specific user 
-                    token = strtok(NULL, " "); // Third "Parameter" should be the username
                     if(is_in_users(token)){
                         send_message_to_user(buffer_out, token);
                     } else {
