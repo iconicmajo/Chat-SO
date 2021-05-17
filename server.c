@@ -264,22 +264,21 @@ void *handle_client(void *arg){
 
         int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
 
-	printf("Buffer: %s\n", buffer_out);
-
-
-        // Make copy of buffer
-        strcpy(buffer_out_copy, buffer_out);
-
-        char* token = strtok(buffer_out_copy, " ");
-        char* show_users_list = "show-users";
-        char* show_users_info = "show-user-info";
-        token = strtok(NULL, " "); // Second "Parameter"
-
-        // * Remove \n to \0
-        str_trim_lf(token, strlen(token));
-
         if (receive > 0)
         {
+
+            printf("Buffer: %s\n", buffer_out);
+            // Make copy of buffer
+            strcpy(buffer_out_copy, buffer_out);
+
+            char* token = strtok(buffer_out_copy, " ");
+            char* show_users_list = "show-users";
+            char* show_users_info = "show-user-info";
+            token = strtok(NULL, " "); // Second "Parameter"
+
+            // * Remove \n to \0
+            str_trim_lf(token, strlen(token));
+
             if (strlen(buffer_out) > 0)
             {
                  if(strcmp(token, show_users_list) == 0){// Desplegar listado de usuarios
@@ -292,7 +291,7 @@ void *handle_client(void *arg){
                     display_user_info(cli->sockfd, cli->uid, token);
                 } else if(strcmp(token, "exit") == 0){
                     // Send Message that a client has left
-		    printf("Llega If");
+		            printf("Llega If");
                     sprintf(buffer_out, "%s has left\n", cli->name);
                     printf("%s\n", buffer_out);
                     send_message(buffer_out, cli->uid);
