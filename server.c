@@ -387,9 +387,9 @@ int main(int argc, char **argv){
     }
 
     printf("\n\t=== Welcome to Chatroom === \n");
-    printf("\n\tOUT COMMANDS: \n");
-    printf("\n\thelp: for help \n");
-    printf("\n\thelp: for help \n");
+    //printf("\n\tOUT COMMANDS: \n");
+    //printf("\n\thelp: for help \n");
+    //printf("\n\thelp: for help \n");
 
 
     // ! TODO: imprimir instrucciones de uso
