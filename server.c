@@ -387,10 +387,13 @@ int main(int argc, char **argv){
     }
 
     printf("\n\t=== Welcome to Chatroom === \n");
-    //printf("\n\tOUT COMMANDS: \n");
-    //printf("\n\thelp: for help \n");
-    //printf("\n\thelp: for help \n");
-
+    printf("\n\tOUR COMMANDS: \n");
+    printf("\n\thelp: This command is for display chat commands.\n");
+    printf("\n\tshow-user-info <user-name>: This command is to display provided user's IP address. \n");
+    printf("\n\tshow-users: This command is for displaying all connected users.\n");
+    printf("\n\t<user-name> <message>: This is for private messages. Only if provided user is connected, otherwise msg will be sent to all users.\n");
+    printf("\n\tchange-status <ACTIVE, BUSY, INACTIVE>: This command is to change user's status.\n");
+    printf("\n\texit: This command is to leave the chat.\n");
 
     // ! TODO: imprimir instrucciones de uso
 
