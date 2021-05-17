@@ -44,6 +44,7 @@ typedef struct {
     char name[32];
     char status[32];
     time_t lastsms;
+    char buf[80];
 } client_t, *client_t_ptr;
 
 client_t *clients[MAX_CLIENTS];
@@ -412,7 +413,8 @@ int main(int argc, char **argv){
         cli->sockfd = connfd;
         cli->uid = uid++;
         cli->lastsms = time(0);
-        printf("Fecha: %s\n",cli->lastsms);
+        strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", ts);
+        printf("%s\n", buf);
         strcpy(cli->status, ACTIVE_STATUS);
 
         // Add Client to queue
