@@ -22,6 +22,7 @@ Osmin Josue Sagastume           18173
 #include <sys/types.h>
 #include <signal.h>
 #include <stdbool.h>
+#include <time.h>
 
 #define MAX_CLIENTS 100
 #define BUFFER_SZ 2048
@@ -42,6 +43,7 @@ typedef struct {
     int uid; // Unique for every client
     char name[32];
     char status[32];
+    time_t lastsms;
 } client_t, *client_t_ptr;
 
 client_t *clients[MAX_CLIENTS];
@@ -387,13 +389,6 @@ int main(int argc, char **argv){
     }
 
     printf("\n\t=== Welcome to Chatroom === \n");
-    //printf("\n\tOUR COMMANDS: \n");
-    //printf("\n\thelp: This command is for display chat commands.\n");
-    //printf("\n\tshow-user-info <user-name>: This command is to display provided user's IP address. \n");
-    //printf("\n\tshow-users: This command is for displaying all connected users.\n");
-    //printf("\n\t<user-name> <message>: This is for private messages. Only if provided user is connected, otherwise msg will be sent to all users.\n");
-    //printf("\n\tchange-status <ACTIVE, BUSY, INACTIVE>: This command is to change user's status.\n");
-    //printf("\n\texit: This command is to leave the chat.\n");
 
     // ! TODO: imprimir instrucciones de uso
 
@@ -416,6 +411,8 @@ int main(int argc, char **argv){
         cli->address = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;
+        cli->lastsms = time(0);
+        printf("Fecha: %s\n",cli->lastsms);
         strcpy(cli->status, ACTIVE_STATUS);
 
         // Add Client to queue
