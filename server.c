@@ -275,6 +275,8 @@ void *handle_client(void *arg){
         // * Remove \n to \0
         str_trim_lf(token, strlen(token));
 
+	printf("Buffer: %s\n", buffer_out);
+
         if (receive > 0)
         {
             if (strlen(buffer_out) > 0)
@@ -298,7 +300,7 @@ void *handle_client(void *arg){
                     }
                 }
             }
-        } else if (receive == 0 || strcmp(buffer_out, "exit") == 0){
+        } else if (receive == 0 || strcmp(token, "exit") == 0){
             // Send Message that a client has left
             sprintf(buffer_out, "%s has left\n", cli->name);
             printf("%s\n", buffer_out);
