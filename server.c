@@ -289,6 +289,12 @@ void *handle_client(void *arg){
                     token = strtok(NULL, " "); // Third "Parameter" should be the username
                     str_trim_lf(token, strlen(token));
                     display_user_info(cli->sockfd, cli->uid, token);
+                } else if(strcmp(token, "exit") == 0){
+                    // Send Message that a client has left
+                    sprintf(buffer_out, "%s has left\n", cli->name);
+                    printf("%s\n", buffer_out);
+                    send_message(buffer_out, cli->uid);
+                    leave_flag = 1;
                 } else {
                     // * Validate if message is for specific user 
                     if(is_in_users(token)){
@@ -300,7 +306,7 @@ void *handle_client(void *arg){
                     }
                 }
             }
-        } else if (receive == 0 || strcmp(token, "exit") == 0){
+        } else if (receive == 0){
             // Send Message that a client has left
             sprintf(buffer_out, "%s has left\n", cli->name);
             printf("%s\n", buffer_out);
