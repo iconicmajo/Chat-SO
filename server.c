@@ -297,7 +297,7 @@ void *handle_client(void *arg){
                     leave_flag = 1;
                 } else if(strcmp(token, "help") == 0){
                     // * Send commands
-                    char *help_commands = {"HELP COMMANDS: \n", "help \tThis command is for display chat commands.\n", "show-users \tThis command is for displaying all connected users.\n", "show-user-info <user-name> \tThis command is to display provided user's IP address.\n", "<user-name> <message> \tThis is for private messages. Only if provided user is connected, otherwise msg will be sent to all users.\n"};
+                    char *help_commands = {"HELP COMMANDS: \n", "help \tThis command is for display chat commands.\n", "show-users \tThis command is for displaying all connected users.\n", "show-user-info <user-name> \tThis command is to display provided user's IP address.\n", "<user-name> <message> \tThis is for private messages. Only if provided user is connected, otherwise msg will be sent to all users.\n", "change-status <ACTIVE, BUSY, INACTIVE> \tThis command is to change user's status.\n", "exit \tThis command is to leave the chat.\n"};
                     send_message_to_user(help_commands, cli->name);
                 } else {
                     // * Validate if message is for specific user 
