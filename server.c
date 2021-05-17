@@ -264,6 +264,9 @@ void *handle_client(void *arg){
 
         int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
 
+	printf("Buffer: %s\n", buffer_out);
+
+
         // Make copy of buffer
         strcpy(buffer_out_copy, buffer_out);
 
@@ -274,8 +277,6 @@ void *handle_client(void *arg){
 
         // * Remove \n to \0
         str_trim_lf(token, strlen(token));
-
-	printf("Buffer: %s\n", buffer_out);
 
         if (receive > 0)
         {
@@ -291,6 +292,7 @@ void *handle_client(void *arg){
                     display_user_info(cli->sockfd, cli->uid, token);
                 } else if(strcmp(token, "exit") == 0){
                     // Send Message that a client has left
+		    printf("Llega If");
                     sprintf(buffer_out, "%s has left\n", cli->name);
                     printf("%s\n", buffer_out);
                     send_message(buffer_out, cli->uid);
@@ -308,6 +310,7 @@ void *handle_client(void *arg){
             }
         } else if (receive == 0){
             // Send Message that a client has left
+	    printf("Llega al else\n");
             sprintf(buffer_out, "%s has left\n", cli->name);
             printf("%s\n", buffer_out);
             send_message(buffer_out, cli->uid);
