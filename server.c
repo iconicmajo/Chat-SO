@@ -223,6 +223,8 @@ void *handle_client(void *arg){
     char buffer_out[BUFFER_SZ];
     char buffer_out_copy[BUFFER_SZ];
     char name[32];
+    char *help_commands = {"HELP COMMANDS: \nhelp \t\t\t\t\tThis command is for display chat commands.\nshow-users \t\t\t\tThis command is for displaying all connected users.\nshow-user-info <user-name> \t\tThis command is to display provided user's IP address.\n<user-name> <message> \t\t\tThis is for private messages. Only if provided user is connected, otherwise msg will be sent to all users.\nchange-status <ACTIVE, BUSY, INACTIVE> \tThis command is to change user's status.\nexit \t\t\t\t\tThis command is to leave the chat.\n"};
+
 
     // Client is connected or not?
     int leave_flag = 0;
@@ -254,6 +256,8 @@ void *handle_client(void *arg){
 
     bzero(buffer_out, BUFFER_SZ);
 
+    send_message_to_user(help_commands, cli->name);
+
     while (1)
     {
         if(leave_flag){
@@ -266,8 +270,6 @@ void *handle_client(void *arg){
 
         if (receive > 0)
         {
-
-            printf("Buffer: %s\n", buffer_out);
             // Make copy of buffer
             strcpy(buffer_out_copy, buffer_out);
 
@@ -297,7 +299,6 @@ void *handle_client(void *arg){
                     leave_flag = 1;
                 } else if(strcmp(token, "help") == 0){
                     // * Send commands
-                    char *help_commands = {"HELP COMMANDS: \n", "help \tThis command is for display chat commands.\n", "show-users \tThis command is for displaying all connected users.\n", "show-user-info <user-name> \tThis command is to display provided user's IP address.\n", "<user-name> <message> \tThis is for private messages. Only if provided user is connected, otherwise msg will be sent to all users.\n", "change-status <ACTIVE, BUSY, INACTIVE> \tThis command is to change user's status.\n", "exit \tThis command is to leave the chat.\n"};
                     send_message_to_user(help_commands, cli->name);
                 } else {
                     // * Validate if message is for specific user 
