@@ -295,6 +295,10 @@ void *handle_client(void *arg){
                     printf("%s\n", buffer_out);
                     send_message(buffer_out, cli->uid);
                     leave_flag = 1;
+                } else if(strcmp(token, "help") == 0){
+                    // * Send commands
+                    char *help_commands = {"HELP COMMANDS: \n", "help \tThis command is for display chat commands.\n", "show-users \tThis command is for displaying all connected users.\n", "show-user-info <user-name> \tThis command is to display provided user's IP address.\n", "<user-name> <message> \tThis is for private messages. Only if provided user is connected, otherwise msg will be sent to all users.\n"};
+                    send_message_to_user(help_commands, cli->name);
                 } else {
                     // * Validate if message is for specific user 
                     if(is_in_users(token)){
