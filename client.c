@@ -94,6 +94,7 @@ void send_msg_handler(){
 void recv_msg_handler(){
     char message[LENGTH] = {};
     char error_msg[LENGTH] = "Username already exists.\n";
+    char timeout_msg[LENGTH] = "Sesion has timeout.\n";
     while(1){
         int receive = recv(sockfd, message, LENGTH, 0);
         if(receive > 0){// We receive something
@@ -102,6 +103,10 @@ void recv_msg_handler(){
                 flag = 1;
                 break;
             }
+	   else if(strcmp(timeout_msg, message) == 0){
+	   flag = 1;
+	   break;
+	}
             str_overwrite_stdout();
         } else if(receive == 0){ // Error
             break;

@@ -44,7 +44,6 @@ typedef struct {
     char name[32];
     char status[32];
     time_t lastsms;
-    char buf[80];
 } client_t, *client_t_ptr;
 
 client_t *clients[MAX_CLIENTS];
@@ -251,7 +250,7 @@ void *handle_client(void *arg){
             printf("%s", buffer_out);
             send_message(buffer_out, cli->uid);
         } else {// If username exists
-            sprintf(buffer_out, "Username already exists.\n", cli->name);
+            sprintf(buffer_out, "Username (%s) already exists.\n", cli->name);
             kick_user_out(buffer_out, cli->uid);
             leave_flag = 1;
         }
@@ -268,6 +267,11 @@ void *handle_client(void *arg){
         }
 
         // ! TODO: Inactividad de usuario por un cierto tiempo
+	if ((time(NULL)-(cli->lastsms))>10){
+	    sprintf(buffer_out, "Sesion has timeout.\n");
+            kick_user_out(buffer_out, cli->uid);
+            leave_flag = 1;
+	}
 
         int receive = recv(cli->sockfd, buffer_out, BUFFER_SZ, 0);
 
@@ -391,7 +395,6 @@ int main(int argc, char **argv){
 
     printf("\n\t=== Welcome to Chatroom === \n");
 
-    // ! TODO: imprimir instrucciones de uso
 
     while(1){
         socklen_t clilen = sizeof(cli_addr);
@@ -412,9 +415,9 @@ int main(int argc, char **argv){
         cli->address = cli_addr;
         cli->sockfd = connfd;
         cli->uid = uid++;
-        cli->lastsms = time(0);
-        strftime(buf, sizeof(buf), "%a %Y-%m-%d %H:%M:%S %Z", ts);
-        printf("%s\n", buf);
+        cli->lastsms = time(NULL);
+        //printf("%ld\n",cli->lastsms);
+
         strcpy(cli->status, ACTIVE_STATUS);
 
         // Add Client to queue
