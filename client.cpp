@@ -122,7 +122,7 @@ int main(int argc, char **argv){
     }
 
     //char ip = "127.0.0.1";
-    char *ip = atoi(argv[1]);
+    char *ip = argv[1];
     int port = atoi(argv[2]);
 
     signal(SIGINT, catch_ctrl_c_and_exit);
