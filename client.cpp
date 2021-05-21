@@ -116,8 +116,8 @@ void *recv_msg_handler(void *ptr){
 }
 
 int main(int argc, char **argv){
-    if(argc != 2){
-        printf("Usage: %s <port>\n", argv[0]);
+    if(argc != 3){
+        printf("Usage: %s <ip> <port>\n", argv[0]);
         return EXIT_FAILURE;
     }
 
