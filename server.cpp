@@ -329,8 +329,6 @@ void *handle_client(void *arg){
             leave_flag = 1;
         }
 
-        // ! TODO: Desplegar ayuda con el comando <help>
-
         bzero(buffer_out, BUFFER_SZ);
 
     }
