@@ -24,6 +24,19 @@ Osmin Josue Sagastume           18173
 #include <stdbool.h>
 #include <time.h>
 
+// #ifndef __cplusplus
+//# include <stdatomic.h>
+// #else
+//# include <atomic>
+#include <atomic>
+//using std::atomic_int;
+//using std::memory_order;
+//using std::memory_order_acquire;
+// # define _Atomic(X) std::atomic< X >
+//#endif
+
+//int foo(_Atomic(unsigned)* toto);
+
 #define MAX_CLIENTS 100
 #define BUFFER_SZ 2048
 
@@ -33,7 +46,7 @@ Osmin Josue Sagastume           18173
 #define INACTIVE_STATUS "INACTIVE"
 
 // * Global Variable for Client Count
-static _Atomic unsigned int cli_count = 0;
+std::atomic<int> cli_count{0};
 static int uid = 10;
 
 // * Client Structure
@@ -421,7 +434,7 @@ int main(int argc, char **argv){
         // Add Client to queue
         queue_add(cli);
         // Create Thread
-        pthread_create(&tid, NULL, &handle_client, (void*)cli);
+        pthread_create(&tid, NULL, &handle_client, (void *)cli);
 
         //Reduce CPU usage
         sleep(1);

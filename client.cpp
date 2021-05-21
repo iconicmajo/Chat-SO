@@ -54,7 +54,7 @@ void catch_ctrl_c_and_exit(int sig){
 }
 
 // * Send Msg
-void send_msg_handler(){
+void *send_msg_handler(void *ptr){
     char message[LENGTH] = {};
     char message_copy[LENGTH] = {};
     char buffer[LENGTH + 32] = {};
@@ -67,7 +67,6 @@ void send_msg_handler(){
         strcpy(message_copy, message);
 
         char* token = strtok(message, " ");
-
         if (strcmp(token, "exit") == 0)
         {// Exit chat
             break;
@@ -91,7 +90,7 @@ void send_msg_handler(){
 }
 
 // * Receive Msg from server
-void recv_msg_handler(){
+void *recv_msg_handler(void *ptr){
     char message[LENGTH] = {};
     char error_msg[LENGTH] = "Username already exists.\n";
     char timeout_msg[LENGTH] = "Sesion has timeout.\n";
@@ -163,14 +162,14 @@ int main(int argc, char **argv){
 
     // Thread for sending msg
     pthread_t send_msg_thread;
-    if(pthread_create(&send_msg_thread, NULL, (void*)send_msg_handler, NULL) != 0){
+    if(pthread_create(&send_msg_thread, NULL, &send_msg_handler, NULL) != 0){
         printf("ERROR: pthread.\n");
         return EXIT_FAILURE;
     }
 
     // Thread for receiving msg
     pthread_t recv_msg_thread;
-    if(pthread_create(&recv_msg_thread, NULL, (void*)recv_msg_handler, NULL) != 0){
+    if(pthread_create(&recv_msg_thread, NULL, &recv_msg_handler, NULL) != 0){
         printf("ERROR: pthread.\n");
         return EXIT_FAILURE;
     }
