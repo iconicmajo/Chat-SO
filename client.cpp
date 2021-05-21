@@ -89,7 +89,7 @@ void *send_msg_handler(void *ptr){
     
 }
 
-// * Receive Msg from server
+// * Receive Msg from server 
 void *recv_msg_handler(void *ptr){
     char message[LENGTH] = {};
     char error_msg[LENGTH] = "Username already exists.\n";
