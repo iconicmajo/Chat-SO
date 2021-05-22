@@ -7,7 +7,7 @@ Creado por:
 Juan Fernando De Leon Quezada   17822
 Maria Jose Castro Lemus         181202
 Osmin Josue Sagastume           18173
-:)
+:D
 */
 
 #include <stdio.h>

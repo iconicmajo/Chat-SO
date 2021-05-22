@@ -280,7 +280,7 @@ void *handle_client(void *arg){
         }
 
         // ! TODO: Inactividad de usuario por un cierto tiempo
-	if ((time(NULL)-(cli->lastsms))>10){
+	if ((time(NULL)-(cli->lastsms))>100){
 	    sprintf(buffer_out, "Sesion has timeout.\n");
             kick_user_out(buffer_out, cli->uid);
             leave_flag = 1;
@@ -368,7 +368,7 @@ int main(int argc, char **argv){
         return EXIT_FAILURE;
     }
 
-    char *ip = "127.0.0.1";
+    char *ip = "0.0.0.0";
     int port = atoi(argv[1]);
 
     int option = 1;
