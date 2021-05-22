@@ -23,6 +23,7 @@ Osmin Josue Sagastume           18173
 #include <signal.h>
 #include <stdbool.h>
 #include <time.h>
+#include "payload.pg.h"
 
 // #ifndef __cplusplus
 //# include <stdatomic.h>
@@ -322,13 +323,21 @@ void *handle_client(void *arg){
                     send_message_to_user(help_commands, cli->name);
                 } else {
                     // * Validate if message is for specific user 
-                    if(is_in_users(token)){
-                        send_message_to_user(buffer_out, token);
-                    } else {
-                        send_message(buffer_out, cli->uid);
-                        str_trim_lf(buffer_out, strlen(buffer_out));
-                        printf("%s -> %s\n", buffer_out, cli->name, cli->status);
-                    }
+                    if (payload.flag() == Payload_PayloadFlag::Payload_PayloadFlag_private_chat) {
+			if(is_in_users(token)){
+                            send_message_to_user(buffer_out, token);
+			    Payload server_payload;
+			    server_payload.set_sender("server");
+			    server_payload.set_message(token);
+			    server_payload.set_code(200);
+			    string out;
+			    server_payload.SerializeToString(&out);
+                    	} else {
+                            send_message(buffer_out, cli->uid);
+                            str_trim_lf(buffer_out, strlen(buffer_out));
+                            printf("%s -> %s\n", buffer_out, cli->name, cli->status);
+                    	}
+		    }
                 }
             }
         } else if (receive == 0){

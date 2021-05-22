@@ -21,6 +21,7 @@ Osmin Josue Sagastume           18173
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <stdbool.h>
+#include "payload.pg.h"
 
 #define LENGTH 2048
 
@@ -63,7 +64,8 @@ void *send_msg_handler(void *ptr){
         str_overwrite_stdout();
         fgets(message, LENGTH, stdin);
         str_trim_lf(message, LENGTH);
-
+	Payload payload;
+	payload.set_sender(name);
         strcpy(message_copy, message);
 
         char* token = strtok(message, " ");
@@ -97,7 +99,14 @@ void *recv_msg_handler(void *ptr){
     while(1){
         int receive = recv(sockfd, message, LENGTH, 0);
         if(receive > 0){// We receive something
+	    Payload server_payload;
+	    server_payload.ParseFromString(message);
             printf("%s ", message);
+	    if (server_payload.code() == 200 || server_payload.flag() == Payload_PayloadFlag::Payload_PayloadFlag_private_chat) {
+		printf("%s \n", server_payload.message().c_str());
+	    } else if {
+		printf("Error del server");
+	    }
             if(strcmp(error_msg, message) == 0){
                 flag = 1;
                 break;
